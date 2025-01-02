@@ -46,7 +46,9 @@ public class newStimu : MonoBehaviour
 
     IEnumerator PresentStimuli()
     {
-        while (true)
+        // Regular red and blue stimuli sequence
+        for(int i = 0; i < 1; i++)
+//        while (true)
         {
             // For each VF location, Displays a red stimulus for 0.5 sec,
             // and wait for 3.5 sec (0.5 duration + 3 in between intervals)
@@ -62,6 +64,9 @@ public class newStimu : MonoBehaviour
 //                ShowStimulus(WavelengthToRGB(485), location, 170, 0.5f);
                 yield return new WaitForSeconds(3.5f);
             }
+
+            // After the Stimulus Presentation ends, start Melanopsin Ganglion Cells Testing
+            yield return StartCoroutine(PresentMelanopsinStimuli());
         }
     }
 
@@ -102,6 +107,36 @@ public class newStimu : MonoBehaviour
     private Color AdjustBrightness(Color baseColor, float luminance)
     {
         return new Color(baseColor.r * luminance, baseColor.g * luminance, baseColor.b * luminance, baseColor.a);
+    }
+
+    IEnumerator PresentMelanopsinStimuli()
+    {
+        // Set a dim blue background
+        SetBackground(Color.blue, 0.04f);
+
+//        for (int i = 0; i < vfLocations.Length; i++) // do we need only focal?
+        for (int i = 0; i < 1; i++)
+        {
+            // Focal Blue Light Stimuli for melanopsin
+            ShowStimulus(Color.blue, vfLocations[i], 6000, 8.0f); // 8 seconds duration
+            yield return new WaitForSeconds(16.0f);               // 8 seconds stimulus + 8 seconds interval
+        }
+
+//        // Reset background after melanopsin testing - do we need to?
+//        SetBackground(Color.white, 0.04f); // Restore the regular dim white background
+    }
+
+    void SetBackground(Color color, float luminance)
+    {
+        GameObject background = GameObject.Find("BackgroundPanel");
+        if (background != null)
+        {
+            Image bgImage = background.GetComponent<Image>();
+            if (bgImage != null)
+            {
+                bgImage.color = AdjustBrightness(color, luminance);
+            }
+        }
     }
 
     // Calculates RGB values for a given wavelength within the visible spectrum
